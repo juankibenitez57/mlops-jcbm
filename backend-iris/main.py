@@ -39,7 +39,7 @@ def load_model_background():
         from huggingface_hub import hf_hub_download
         import joblib
 
-        hf_token = os.getenv("HF_TOKEN")
+        hf_token = os.getenv("HF_TOKEN") # Only needed if the repo is private
         repo_id  = os.getenv("HF_REPO_ID", "brjapon/iris-dt")
         filename = os.getenv("HF_MODEL_FILE", "iris_dt.joblib")
 
