@@ -1,16 +1,18 @@
 import gradio as gr
 import requests
+import os
 
-# Set your FastAPI endpoint (update the host and port if different)
-API_URL = "http://127.0.0.1/predict"
+# URL del backend — en Docker Compose se inyecta como variable de entorno
+# (BACKEND_URL=http://backend:8000); fuera de Docker usa localhost por defecto
+API_URL = os.getenv("BACKEND_URL", "http://localhost:8000") + "/predict"
 
 def predict_iris(sepal_length, sepal_width, petal_length, petal_width):
-    # Prepare the data payload for the POST request
+    # Payload con el schema de la API de la solución (snake_case)
     payload = {
-        "SepalLengthCm": sepal_length,
-        "SepalWidthCm": sepal_width,
-        "PetalLengthCm": petal_length,
-        "PetalWidthCm": petal_width
+        "sepal_length": sepal_length,
+        "sepal_width":  sepal_width,
+        "petal_length": petal_length,
+        "petal_width":  petal_width,
     }
 
     # Send the POST request to the FastAPI server
@@ -18,7 +20,11 @@ def predict_iris(sepal_length, sepal_width, petal_length, petal_width):
         response = requests.post(API_URL, json=payload)
         response.raise_for_status()
         result = response.json()
-        return result.get("predicted_species", "No prediction returned")
+        species    = result.get("species", "unknown")
+        confidence = result.get("confidence")
+        if confidence is not None:
+            return f"{species}  (confidence: {confidence:.1%})"
+        return species
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -33,4 +39,6 @@ interface = gr.Interface(
 )
 
 if __name__ == "__main__":
-    interface.launch()
+    # server_name="0.0.0.0" es necesario para que Gradio sea accesible
+    # desde fuera del contenedor Docker (sin esto solo escucha en loopback)
+    interface.launch(server_name="0.0.0.0", server_port=7860)
