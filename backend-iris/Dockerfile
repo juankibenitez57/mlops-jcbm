@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /fastapi
 
 # 1) Run the training script to generate 'iris_model.joblib'
-RUN python train_model.py
+# It is retrieved from Hugging Face Hub in main.py, so this step is optional if the model is already uploaded there.
 
 # Expose port 8000
 EXPOSE 8000
