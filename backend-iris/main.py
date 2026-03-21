@@ -7,8 +7,7 @@ from pydantic import BaseModel
 import huggingface_hub
 from huggingface_hub import hf_hub_download
 
-# huggingface_hub.login(token = 'YOUR_TOKEN')
-huggingface_hub.login(token = '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')
+huggingface_hub.login(token = 'YOUR_TOKEN')
 
 # Using model from Hugging Face Hub: https://huggingface.co/brjapon/iris-dt
 # Accompanying dataset is hosted in Hugging Face under 'brjapon/iris'

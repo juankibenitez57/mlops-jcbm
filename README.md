@@ -1,142 +1,124 @@
-# Deploying a Machine Learning Application
+# MLOps Capstone Project — Iris Prediction Stack
 
-We will use the Iris model we hosted in **HuggingFace Hub**. We developed it in the previous session, as documented Github repository:
+Repositorio de partida para el **LAB 6: Despliegue con Docker** de la asignatura MLOps.
 
-- https://github.com/loyola-masters/HuggingFaceHub-Quick-Start
+El proyecto implementa un sistema de clasificación de flores Iris con dos servicios:
 
-## Running Iris backend app
+- **Backend** — API FastAPI que descarga el modelo desde Hugging Face Hub y sirve predicciones.
+- **Frontend** — Interfaz Gradio para interacción del usuario.
 
-The backend will serve predictions via a API REST developed with FastAPI library.
+Tu tarea es **containerizar** ambos servicios y orquestarlos con Docker Compose.
 
-Follow these steps to get the application running:
+---
 
-1. Create a new environment and install dependencies:
+## Estructura del repositorio
 
-```bash
-conda create -n MLOps-Capstone-Project python=3.9
-pip install -r requirements.txt
+```
+MLOps-Capstone-Project/
+├── backend-iris/
+│   ├── main.py               ← API FastAPI (punto de partida — modificar)
+│   ├── Dockerfile            ← Dockerfile del backend (punto de partida — modificar)
+│   └── requirements.txt      ← Dependencias del backend
+├── frontend-iris/
+│   ├── gradio_app.py         ← Interfaz Gradio (punto de partida — modificar)
+│   └── requirements.txt      ← Dependencias del frontend
+└── docker-compose.yml        ← a crear
 ```
 
-2. (Optional) Script `train_model.py` makes all the work locally, producing the model file `iris_model.joblib`. You can use this script to remember how the model was trained with the `RandomForestClassifier` of Sklearn
+---
 
-```bash
-cd backend-iris
-python train_model.py
-```
+## Entregables del laboratorio
 
-3. Use the script `prediction.py` to confirm that predictions are done properly using the model hosted in Hugging Face (`brjapon/iris-dt`). This model was a `DecisionTreeClassifier`, whose accuracy is very similar to the one above.
+| Fichero                      | Descripción                                               |
+| ---------------------------- | ---------------------------------------------------------- |
+| `backend-iris/Dockerfile`  | Imagen del backend con `HEALTHCHECK` incluido            |
+| `frontend-iris/Dockerfile` | Imagen del frontend                                        |
+| `docker-compose.yml`       | Orquestación del stack con `condition: service_healthy` |
+| `verify_stack.sh`          | Script de verificación end-to-end                         |
 
-```bash
-cd backend-iris
-python prediction.py
-```
+Consulta el enunciado completo en `LAB6_Docker_Deployment.md` para los requisitos detallados de cada fichero.
 
-4. Run the backend with FastAPI
+---
 
-```bash
-uvicorn main:app --host 0.0.0.0 --port 80
-```
+## API del backend (referencia)
 
-Find the Swagger documentation of the API at `http://127.0.0.1/docs`
+### `GET /health`
 
-#### How to test the Iris prediction endpoint
-
-Send a POST request to `http://127.0.0.1:80/predict` with JSON body, for example:
+Devuelve el estado del servicio. Debe retornar HTTP 200 **solo cuando el modelo esté cargado en memoria**.
 
 ```json
-   {
-     "SepalLengthCm": 5.1,
-     "SepalWidthCm": 3.5,
-     "PetalLengthCm": 1.4,
-     "PetalWidthCm": 0.2
-   }
+{
+  "status": "ok",
+  "model_loaded": true,
+  "model_version": "v1.0-base",
+  "uptime_seconds": 12.4
+}
 ```
 
-   You can do it via Swagger interface at [http://127.0.0.1:8001/docs](http://127.0.0.1:8001/docs), or with a tool like `curl` or Postman. The response will look like:
+### `POST /predict`
+
+**Request:**
 
 ```json
-   {
-     "predicted_species": "iris-setosa"
-   }
+{
+  "sepal_length": 5.1,
+  "sepal_width": 3.5,
+  "petal_length": 1.4,
+  "petal_width": 0.2
+}
 ```
 
-## Running frontend app Iris (Gradio)
+**Response:**
 
-Run the gradio app:
+```json
+{
+  "prediction": 0,
+  "species": "setosa",
+  "confidence": 1.0
+}
+```
+
+---
+
+## Variables de entorno
+
+| Variable        | Obligatoria   | Descripción                                                    |
+| --------------- | ------------- | --------------------------------------------------------------- |
+| `HF_TOKEN`    | Sí           | Token de Hugging Face Hub para descargar el modelo              |
+| `BACKEND_URL` | No (frontend) | URL del backend; en Docker Compose usar `http://backend:8000` |
+
+Crea un fichero `.env` en la raíz con tu token antes de arrancar el stack:
 
 ```bash
-python ./frontend-iris/gradio_app.py
+HF_TOKEN=hf_tu_token_aqui
 ```
 
-This block of the script is the responsible of getting the prediction from the API:
+> `.env` está en `.gitignore` — nunca subas tu token a Git.
 
-```python
-   # Send the POST request to the FastAPI server
-    try:
-        response = requests.post(API_URL, json=payload)
-        response.raise_for_status()
-        result = response.json()
-        return result.get("predicted_species", "No prediction returned")
-    except Exception as e:
-        return f"Error: {str(e)}"
-```
+---
 
-## ANNEX: Using Docker
+## Referencias
 
-### Iris backend app: running with Docker
+- [Enunciado del laboratorio](../STATEMENT/LAB6_Docker_Deployment.md)
+- [Solución de referencia](../STATEMENT/SOLUTION/code/)
+- [Docker Documentation — Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
+- [Docker Compose — Getting started](https://docs.docker.com/compose/gettingstarted/)
+- [FastAPI — Deployment with Docker](https://fastapi.tiangolo.com/deployment/docker/)
 
-1. **Build** the Docker image:
-   ```bash
-   docker build -t backend-iris .
-   ```
-2. **Run** a container from that image:
-   ```bash
-   docker run -d -p 8001:80 --name backend-iris-app backend-iris
-   ```
+---
 
-The last line in the `Dockerfile` provides the command that is executed when running the container:
+# ANEXO: Mapa de ficheros
 
-```Dockerfile
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
-```
+Guía para orientar el proceso de edición de código:
 
-This command is the same than running from the command line in the host: `uvicorn main:app --host 0.0.0.0 --port 80`
-
-3. Test that the API is up at [http://127.0.0.1:8001](http://127.0.0.1:8001)
-
-#### How to test the Iris prediction endpoint
-
-Send a POST request to `http://127.0.0.1:8001/predict` with JSON body, for example:
-
-```json
-   {
-     "SepalLengthCm": 5.1,
-     "SepalWidthCm": 3.5,
-     "PetalLengthCm": 1.4,
-     "PetalWidthCm": 0.2
-   }
-```
-
-   You can test this via the Swagger interface at [http://127.0.0.1:8001/docs](http://127.0.0.1:8001/docs) or with a tool like `curl` or Postman. The response will look like:
-
-```json
-   {
-     "predicted_species": "iris-setosa"
-   }
-```
-
-Using Powershell:
-
-```powershell
-   Invoke-RestMethod `
-  -Uri http://127.0.0.1:8001/predict `
-  -Method POST `
-  -ContentType "application/json" `
-  -Body '{"sepal_length":5.1,"sepal_width":3.5,"petal_length":1.4,"petal_width":0.2}'
-```
-
-### Iris Gradio app: running with Docker
-
-TO DO
-
-- This is your task
+| Fichero                            | Repo de partida     | Solución         | Estado del gap       |
+| ---------------------------------- | ------------------- | ----------------- | -------------------- |
+| `backend-iris/Dockerfile`        | Existe (incompleto) | Existe (completo) | **Modificar**  |
+| `backend-iris/main.py`           | Existe (incompleto) | Existe (completo) | **Reescribir** |
+| `backend-iris/requirements.txt`  | **No existe** | Existe            | **Crear**      |
+| `frontend-iris/gradio_app.py`    | Existe (incompleto) | Existe (completo) | **Modificar**  |
+| `frontend-iris/Dockerfile`       | **No existe** | Existe            | **Crear**      |
+| `frontend-iris/requirements.txt` | **No existe** | Existe            | **Crear**      |
+| `docker-compose.yml`             | **No existe** | Existe            | **Crear**      |
+| `verify_stack.sh`                | **No existe** | Existe            | **Crear**      |
+| `.env` / `.env.example`        | **No existe** | Existe            | **Crear**      |
