@@ -109,16 +109,16 @@ HF_TOKEN=hf_tu_token_aqui
 
 # ANEXO: Mapa de ficheros
 
-Guía para orientar el proceso de edición de código:
+Guía para orientar el proceso de edición de código (análisis de gap):
 
-| Fichero                            | Repo de partida     | Solución         | Estado del gap       |
-| ---------------------------------- | ------------------- | ----------------- | -------------------- |
-| `backend-iris/Dockerfile`        | Existe (incompleto) | Existe (completo) | **Modificar**  |
-| `backend-iris/main.py`           | Existe (incompleto) | Existe (completo) | **Reescribir** |
-| `backend-iris/requirements.txt`  | **No existe** | Existe            | **Crear**      |
-| `frontend-iris/gradio_app.py`    | Existe (incompleto) | Existe (completo) | **Modificar**  |
-| `frontend-iris/Dockerfile`       | **No existe** | Existe            | **Crear**      |
-| `frontend-iris/requirements.txt` | **No existe** | Existe            | **Crear**      |
-| `docker-compose.yml`             | **No existe** | Existe            | **Crear**      |
-| `verify_stack.sh`                | **No existe** | Existe            | **Crear**      |
-| `.env` / `.env.example`        | **No existe** | Existe            | **Crear**      |
+| Fichero                            | Repo de partida     | Solución          | Estado del gap       |
+| ---------------------------------- | ------------------- | ------------------ | -------------------- |
+| `backend-iris/Dockerfile`        | Existe (incompleto) | Existe (completo) | **Reescribir**      |
+| `backend-iris/main.py`           | Existe (incompleto) | Existe (completo)  | **Reescribir** |
+| `backend-iris/requirements.txt`  | **Existe**    | Existe             | **OK**         |
+| `frontend-iris/gradio_app.py`    | Existe              | Existe             | **OK**         |
+| `frontend-iris/Dockerfile`       | **No existe** | Existe             | **Crear**      |
+| `frontend-iris/requirements.txt` | **Existe**    | Existe             | **OK**         |
+| `docker-compose.yml`             | **Existe**    | Existe             | **OK**         |
+| `verify_stack.sh`                | **Existe**    | Existe             | **OK**         |
+| `.env` / `.env.example`        | **No existe** | Existe             | **Crear**      |
