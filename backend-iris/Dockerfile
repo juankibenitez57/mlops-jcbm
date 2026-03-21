@@ -14,8 +14,8 @@ COPY . /fastapi
 # 1) Run the training script to generate 'iris_model.joblib'
 RUN python train_model.py
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8000
+EXPOSE 8000
 
 # 2) Run the FastAPI app with uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

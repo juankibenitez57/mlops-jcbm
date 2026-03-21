@@ -22,7 +22,7 @@ services:
       - LOG_LEVEL=info
     restart: unless-stopped
     # El health check está definido en el Dockerfile del backend.
-    # Docker Compose lo usa automáticamente para el estado "healthy".
+    # Docker Compose lo deberá integrar automáticamente para el estado "healthy".
 
   # ── Frontend: interfaz de usuario Gradio ────────────────────
   frontend:
