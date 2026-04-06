@@ -1,21 +1,27 @@
-# Use a lightweight Python base image
-FROM python:3.9-slim
+# Imagen base oficial de Python, versión slim para reducir tamaño
+FROM python:3.11-slim
 
-# Create a working directory
-WORKDIR /fastapi
+# Directorio de trabajo dentro del contenedor
+WORKDIR /app
 
-# Copy requirements and install them
-COPY requirements.txt /fastapi/requirements.txt
+# curl necesario para el HEALTHCHECK
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+# Copiar e instalar dependencias ANTES que el código fuente
+# Así la capa de pip se cachea aunque cambie el código
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire project into the container
-COPY . /fastapi
+# Copiar el código de la aplicación
+COPY . .
 
-# 1) Run the training script to generate 'iris_model.joblib'
-# It is retrieved from Hugging Face Hub in main.py, so this step is optional if the model is already uploaded there.
-
-# Expose port 8000
+# Puerto que expone el contenedor (documentación, no mapeo real)
 EXPOSE 8000
 
-# 2) Run the FastAPI app with uvicorn
+# Health check: espera hasta 30s al arranque y reintenta cada 10s
+# El contenedor pasa a "healthy" solo cuando el modelo está cargado (HTTP 200)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Bind en 0.0.0.0 para que sea accesible desde fuera del contenedor
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
