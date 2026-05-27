@@ -1,0 +1,11 @@
+Lab - Entrenamiento de modelo en AWS
+=====================================
+
+Repositorio:
+https://github.com/juankibenitez57/mlops-jcbm/tree/Lab-Entrenamiento-AWS/3-aws-sagemaker-titanic
+
+Archivos entregados:
+- src/preprocessing.py  → Processing Job (limpieza, FE, split train/validation)
+- src/train.py          → Training Job (RandomForestClassifier, métricas)
+- notebook.ipynb        → Orquestador (ejecutar en SageMaker Studio)
+- data/titanic_raw.csv  → Dataset crudo de entrada
