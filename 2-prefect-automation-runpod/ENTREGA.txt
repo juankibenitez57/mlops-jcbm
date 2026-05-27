@@ -1,0 +1,87 @@
+=====================================================================
+  LAB B — Migración de entrenamiento y despliegue a RunPod
+  Alumno: Juan Carlos Benitez Mora
+  Fecha:  2026-05-27
+=====================================================================
+
+REPOSITORIO GITHUB
+------------------
+URL:  https://github.com/juankibenitez57/mlops-jcbm
+Rama: LabB-Migracion-RunPod
+
+PROYECTO WEIGHTS & BIASES
+--------------------------
+URL:  https://wandb.ai/jcbenitezbenitezmora-loyola-andalucia/titanic-mlops
+Artefacto entrenado en RunPod: titanic-rf-runpod:latest
+
+ENDPOINT SERVERLESS RUNPOD
+--------------------------
+Endpoint ID: 5uor1946n19jqs
+URL base:    https://api.runpod.ai/v2/5uor1946n19jqs
+
+Ejemplo de petición de inferencia:
+  curl -X POST https://api.runpod.ai/v2/5uor1946n19jqs/runsync \
+    -H "Authorization: Bearer <RUNPOD_API_KEY>" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": {
+        "samples": [{
+          "Pclass": 3, "Sex": 0, "Age": 22, "SibSp": 1, "Parch": 0,
+          "Fare": 7.25, "Embarked": 0, "FamilySize": 2,
+          "IsAlone": 0, "FarePerPerson": 3.625
+        }]
+      }
+    }'
+
+Respuesta: {"prediction": [0]}  (0=no sobrevive, 1=sobrevive)
+
+DOCKER HUB
+----------
+Imagen entrenamiento: juankibenitez/titanic-rf-training:latest
+Imagen inferencia:    juankibenitez/titanic-rf-predict:latest
+
+CONTENIDO DEL REPOSITORIO
+--------------------------
+  f01_build.py          Flow 1: construye y sube imagen de entrenamiento a Docker Hub
+  f02_train_pod.py      Flow 2: lanza Pod RunPod que entrena RF y sube modelo a W&B
+  f03_deploy.py         Flow 3: construye imagen predict y despliega endpoint serverless
+  deploy_flows.py       Despliega los 3 flows de Prefect con una sola ejecución
+  docker-compose.yml    Infraestructura Prefect con Docker (Postgres + Redis + Server)
+  SETUP.md              Guía de configuración completa
+  train/train.py        Script de entrenamiento (ejecuta dentro del Pod RunPod)
+  train/Dockerfile      Imagen Docker para el Pod de entrenamiento
+  predict/handler.py    Handler serverless RunPod para inferencia Titanic
+  predict/Dockerfile    Imagen Docker para el endpoint serverless
+  config/               Configuraciones JSON (wandb, docker, runpod, training)
+
+FLUJOS EJECUTADOS Y VERIFICADOS
+--------------------------------
+  f01: imagen juankibenitez/titanic-rf-training:latest → Docker Hub ✓
+  f02: Pod RunPod (NVIDIA RTX A4000) entrenó RandomForest → W&B artifact titanic-rf-runpod:v0 ✓
+  f03: imagen juankibenitez/titanic-rf-predict:latest → Docker Hub + endpoint RunPod ✓
+  Inferencia: {"prediction": [0]} ← respuesta real del endpoint serverless ✓
+
+INSTRUCCIONES DE EJECUCIÓN
+---------------------------
+Ver SETUP.md para configuración completa. Resumen:
+
+  1. Copiar .env.example a .env y rellenar WANDB_API_KEY, RUNPOD_API_KEY, DOCKER_PAT
+  2. uv sync
+  3. Levantar Prefect:
+       prefect server start  (terminal 1)
+  4. Ejecutar los flows en orden:
+       python f01_build.py      # construye y sube imagen de entrenamiento
+       python f02_train_pod.py  # lanza pod de entrenamiento en RunPod
+       python f03_deploy.py     # despliega modelo como serverless
+     O desplegar todos con una sola ejecución:
+       python deploy_flows.py
+  5. Con Docker Compose:
+       docker compose up -d
+       python deploy_flows.py
+
+NOTA SOBRE CPU vs GPU
+---------------------
+La API REST de RunPod (/v1/pods) no soporta pods CPU puros mediante API;
+requieren creación manual via UI. Se usó NVIDIA RTX A4000 (GPU más económica
+disponible). El entrenamiento de Titanic con RandomForest dura < 1 segundo,
+por lo que el coste total del pod fue < 0.01 USD.
