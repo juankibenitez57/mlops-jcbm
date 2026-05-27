@@ -1,0 +1,11 @@
+{
+    "target": "Survived",
+    "features": [
+        "Pclass", "Sex", "Age", "SibSp", "Parch",
+        "Fare", "Embarked", "FamilySize", "IsAlone", "FarePerPerson"
+    ],
+    "n_estimators": 100,
+    "max_depth": 8,
+    "test_size": 0.2,
+    "random_state": 42
+}

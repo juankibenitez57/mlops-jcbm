@@ -1,0 +1,8 @@
+{
+    "training": {
+        "image_name": "juankibenitez/titanic-rf-training:latest"
+    },
+    "predict": {
+        "image_name": "juankibenitez/titanic-rf-predict:latest"
+    }
+}

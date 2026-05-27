@@ -1,0 +1,14 @@
+{
+    "training": {
+        "pod_name": "titanic-training-pod",
+        "compute_type": "CPU",
+        "container_disk_in_gb": 5,
+        "volume_in_gb": 2,
+        "volume_mount_path": "/workspace"
+    },
+    "deployment": {
+        "template_id": "FILL_IN_RUNPOD_TEMPLATE_ID",
+        "endpoint_id": "FILL_IN_RUNPOD_ENDPOINT_ID",
+        "container_disk_in_gb": 5
+    }
+}

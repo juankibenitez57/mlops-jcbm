@@ -1,0 +1,10 @@
+{
+    "entity": "jcbenitezbenitezmora-loyola-andalucia",
+    "project": "titanic-mlops",
+    "train_job_type": "model-train-runpod",
+    "processed_artifact_name": "titanic_processed",
+    "processed_artifact_version": "latest",
+    "processed_filename": "titanic_processed.csv",
+    "model_artifact_name": "titanic-rf-runpod",
+    "model_artifact_type": "model"
+}
