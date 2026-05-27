@@ -1,0 +1,5 @@
+{
+    "project": "titanic-mlops",
+    "artifact_name": "titanic_raw",
+    "artifact_type": "dataset"
+}

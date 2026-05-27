@@ -1,0 +1,24 @@
+{
+    "project": "titanic-mlops",
+    "process_job_type": "data-processing",
+    "train_job_type": "model-train",
+    "artifact_name": "titanic_raw",
+    "artifact_version": "latest",
+    "dataset_filename": "titanic_raw.csv",
+    "drop_columns": ["PassengerId", "Name", "Ticket", "Cabin"],
+    "processed_artifact_name": "titanic_processed",
+    "processed_artifact_type": "dataset",
+    "processed_artifact_version": "latest",
+    "processed_filename": "titanic_processed.csv",
+    "target": "Survived",
+    "features": [
+        "Pclass", "Sex", "Age", "SibSp", "Parch",
+        "Fare", "Embarked", "FamilySize", "IsAlone", "FarePerPerson"
+    ],
+    "model_artifact_name": "titanic-rf-decoupled",
+    "model_artifact_type": "model",
+    "n_estimators": 100,
+    "max_depth": 8,
+    "test_size": 0.2,
+    "random_state": 42
+}
