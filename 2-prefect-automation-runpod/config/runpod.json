@@ -1,14 +1,14 @@
 {
     "training": {
         "pod_name": "titanic-training-pod",
-        "compute_type": "CPU",
+        "gpu_type_id": "NVIDIA RTX A4000",
         "container_disk_in_gb": 5,
         "volume_in_gb": 2,
         "volume_mount_path": "/workspace"
     },
     "deployment": {
-        "template_id": "FILL_IN_RUNPOD_TEMPLATE_ID",
-        "endpoint_id": "FILL_IN_RUNPOD_ENDPOINT_ID",
+        "template_id": "p2rvhy8u3w",
+        "endpoint_id": "5uor1946n19jqs",
         "container_disk_in_gb": 5
     }
 }

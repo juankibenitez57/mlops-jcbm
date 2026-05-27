@@ -50,3 +50,7 @@ def build_and_push_pipeline() -> None:
     docker_login(image_name)
     docker_build(image_name)
     docker_push(image_name)
+
+
+if __name__ == "__main__":
+    build_and_push_pipeline()

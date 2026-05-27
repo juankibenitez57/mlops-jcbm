@@ -82,3 +82,7 @@ def deploy_predict_pipeline() -> None:
     docker_push_predict(image_name)
     update_template()
     update_endpoint()
+
+
+if __name__ == "__main__":
+    deploy_predict_pipeline()
