@@ -1,0 +1,66 @@
+=====================================================
+  LAB A — Workflow con Prefect y Weights & Biases
+  Alumno: Juan Carlos Benitez Mora
+  Fecha:  2026-05-27
+=====================================================
+
+REPOSITORIO GITHUB
+------------------
+URL:  https://github.com/juankibenitez57/mlops-jcbm
+Rama: LabA-Workflow-Prefect-WandB
+
+PROYECTO WEIGHTS & BIASES
+--------------------------
+URL:  https://wandb.ai/jcbenitezbenitezmora-loyola-andalucia/titanic-mlops
+Runs: 4 ejecuciones registradas
+  - lilac-surf-1      → upload dataset (wandb_init.py)
+  - resilient-puddle-2 → F01 Monolito completo
+  - light-brook-3     → F02a Procesado de datos
+  - playful-dawn-4    → F02b Entrenamiento del modelo
+
+CONTENIDO DEL ZIP
+-----------------
+  f01_monolith.py          Flujo monolítico (1 flow, 6 tasks)
+  f02_decoupled.py         Flujos desacoplados (2 flows, 8 tasks)
+  wandb_init.py            Script de carga del dataset a W&B
+  deploy_flows.py          Despliega ambos flujos con una sola ejecución
+  docker-compose.yml       Infraestructura Prefect con Docker
+  design_document.md       Documento de diseño con etapas y criterios
+  config/f01_config.json   Configuración flujo monolítico
+  config/f02_config.json   Configuración flujos desacoplados
+  .env.example             Variables de entorno necesarias (sin claves reales)
+  utils/config.py          Cargador de configuración JSON
+  utils/data/titanic_raw.csv  Dataset Titanic
+
+INSTRUCCIONES DE EJECUCIÓN
+---------------------------
+1. Copiar .env.example a .env y rellenar WANDB_API_KEY
+
+2. Instalar dependencias:
+   uv sync
+   (o: pip install -r requirements según entorno)
+
+3. Subir dataset a W&B (solo primera vez):
+   python wandb_init.py
+
+4. Opción A — Servidor local:
+   prefect server start          (terminal 1)
+   python deploy_flows.py        (terminal 2, despliega los 3 flows)
+
+   O ejecución directa:
+   python f01_monolith.py
+   python f02_decoupled.py
+
+5. Opción B — Docker Compose:
+   docker compose up -d
+   python deploy_flows.py
+
+RESULTADOS OBTENIDOS
+--------------------
+  Accuracy:  80.4%
+  Precision: 75.8%
+  Recall:    72.5%
+  F1-score:  74.1%
+
+  Modelo: RandomForestClassifier (n_estimators=100, max_depth=8)
+  Split:  80% train / 20% test, estratificado por Survived
